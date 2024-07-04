@@ -29,8 +29,8 @@ Ikuti langkah-langkah di bawah ini untuk menginstal dan menjalankan project ini 
 1. **Clone repositori ini**
 
    ```bash
-   git clone https://github.com/username/CI4_CRUD.git
-   cd CI4_CRUD
+   git clone https://github.com/Doni354/CI4_CRUD.Mahasiswa
+   cd CI4_CRUD.Mahasiswa
    ```
 
 2. **Instal dependensi dengan Composer**
@@ -39,10 +39,10 @@ Ikuti langkah-langkah di bawah ini untuk menginstal dan menjalankan project ini 
    composer install
    ```
 
-3. **Salin file `.env.example` menjadi `.env`**
+3. **Ubah file `env` menjadi `.env`**
 
    ```bash
-   cp env.example .env
+   cp env .env
    ```
 
 4. **Konfigurasi basis data**
@@ -101,10 +101,5 @@ Ikuti langkah-langkah di bawah ini untuk menginstal dan menjalankan project ini 
 
 Jika Anda ingin berkontribusi pada proyek ini, silakan buat pull request atau buka issue untuk mendiskusikan perubahan yang ingin Anda lakukan.
 
-## Lisensi
-
-Proyek ini dilisensikan di bawah lisensi MIT. Lihat file [LICENSE](LICENSE) untuk informasi lebih lanjut.
-
 ---
 
-Pastikan untuk mengganti `https://github.com/username/CI4_CRUD.git` dengan URL repositori GitHub Anda yang sebenarnya.
