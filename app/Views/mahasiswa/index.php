@@ -75,7 +75,7 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="nim">NIM</label>
-                            <input type="text" class="form-control" id="nim" name="nim" required>
+                            <input type="number" class="form-control" id="nim" name="nim" required>
                         </div>
                         <div class="form-group">
                             <label for="nama">Nama</label>
@@ -115,7 +115,7 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="edit_nim">NIM</label>
-                            <input type="text" class="form-control" id="edit_nim" name="nim" required>
+                            <input type="number" class="form-control" id="edit_nim" name="nim" required>
                         </div>
                         <div class="form-group">
                             <label for="edit_nama">Nama</label>
