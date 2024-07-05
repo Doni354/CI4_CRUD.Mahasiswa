@@ -13,6 +13,13 @@
         .table img {
             width: 100px;
             height: auto;
+            cursor: pointer; /* Menambahkan cursor pointer saat gambar di-hover */
+        }
+        .modal-img {
+            max-width: 100%;
+            height: auto;
+            margin: auto;
+            display: block;
         }
     </style>
 </head>
@@ -38,8 +45,8 @@
                 <tr>
                     <td><?= $mhs['nim']; ?></td>
                     <td><?= $mhs['nama']; ?></td>
-                    <td><img src="/uploads/<?= $mhs['foto_diri']; ?>"></td>
-                    <td><img src="/uploads/<?= $mhs['foto_ktp']; ?>"></td>
+                    <td><img src="/uploads/<?= $mhs['foto_diri']; ?>" class="img-thumbnail" data-toggle="modal" data-target="#viewImageModal" data-src="/uploads/<?= $mhs['foto_diri']; ?>"></td>
+                    <td><img src="/uploads/<?= $mhs['foto_ktp']; ?>" class="img-thumbnail" data-toggle="modal" data-target="#viewImageModal" data-src="/uploads/<?= $mhs['foto_ktp']; ?>"></td>
                     <td>
                         <button class="btn btn-warning" data-toggle="modal" data-target="#editModal" data-id="<?= $mhs['id']; ?>" data-nim="<?= $mhs['nim']; ?>" data-nama="<?= $mhs['nama']; ?>" data-fotodiri="<?= $mhs['foto_diri']; ?>" data-fotoktp="<?= $mhs['foto_ktp']; ?>">Edit</button>
                         <form action="/mahasiswa/delete/<?= $mhs['id']; ?>" method="post" class="d-inline">
@@ -131,10 +138,35 @@
         </div>
     </div>
 
+    <!-- View Image Modal -->
+    <div class="modal fade" id="viewImageModal" tabindex="-1" aria-labelledby="viewImageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg"> <!-- modal-lg untuk modal lebih besar -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewImageModalLabel">Lihat Gambar</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="modalImage" class="modal-img">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+        $(document).ready(function() {
+            $('.img-thumbnail').on('click', function() {
+                var src = $(this).data('src');
+                $('#modalImage').attr('src', src);
+                $('#viewImageModal').modal('show');
+            });
+        });
+
         $('#editModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
             var id = button.data('id');
