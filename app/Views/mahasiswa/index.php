@@ -28,7 +28,7 @@
     <div class="container mt-5">
         <div class="header">
             <h1>CRUD Mahasiswa</h1>
-            <p>Manage your students' data efficiently</p>
+            <p>by Doni_354</p>
         </div>
         <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#createModal">Tambah Mahasiswa</button>
         <table class="table table-bordered">
