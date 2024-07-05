@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Mahasiswa</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
     <style>
         .header {
             margin: 20px 0;
@@ -70,7 +71,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="/mahasiswa/store" method="post" enctype="multipart/form-data">
+                <form id="createForm" action="/mahasiswa/store" method="post" enctype="multipart/form-data">
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="nim">NIM</label>
@@ -82,11 +83,13 @@
                         </div>
                         <div class="form-group">
                             <label for="foto_diri">Foto Diri</label>
-                            <input type="file" class="form-control" id="foto_diri" name="foto_diri" required>
+                            <input type="file" class="form-control-file" id="foto_diri" name="foto_diri" required>
+                            <img id="foto_diri_preview" class="img-fluid mt-2">
                         </div>
                         <div class="form-group">
                             <label for="foto_ktp">Foto KTP</label>
-                            <input type="file" class="form-control" id="foto_ktp" name="foto_ktp" required>
+                            <input type="file" class="form-control-file" id="foto_ktp" name="foto_ktp" required>
+                            <img id="foto_ktp_preview" class="img-fluid mt-2">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -108,7 +111,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="" method="post" enctype="multipart/form-data" id="editForm">
+                <form id="editForm" action="" method="post" enctype="multipart/form-data">
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="edit_nim">NIM</label>
@@ -120,13 +123,13 @@
                         </div>
                         <div class="form-group">
                             <label for="edit_foto_diri">Foto Diri</label>
-                            <input type="file" class="form-control" id="edit_foto_diri" name="foto_diri">
-                            <img id="edit_foto_diri_preview" width="100">
+                            <input type="file" class="form-control-file" id="edit_foto_diri" name="foto_diri">
+                            <img id="edit_foto_diri_preview" class="img-fluid mt-2">
                         </div>
                         <div class="form-group">
                             <label for="edit_foto_ktp">Foto KTP</label>
-                            <input type="file" class="form-control" id="edit_foto_ktp" name="foto_ktp">
-                            <img id="edit_foto_ktp_preview" width="100">
+                            <input type="file" class="form-control-file" id="edit_foto_ktp" name="foto_ktp">
+                            <img id="edit_foto_ktp_preview" class="img-fluid mt-2">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -155,32 +158,110 @@
         </div>
     </div>
 
+    <!-- Crop Image Modal -->
+    <div class="modal fade" id="cropImageModal" tabindex="-1" aria-labelledby="cropImageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg"> <!-- modal-lg untuk modal lebih besar -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cropImageModalLabel">Crop Gambar</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="img-container">
+                        <img id="cropperImage" class="img-fluid">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="cropButton">Crop & Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <script>
         $(document).ready(function() {
+            var cropper;
+            var cropperModal = $('#cropImageModal');
+            var cropperImage = document.getElementById('cropperImage');
+            var inputElement;
+
+            function readFile(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        cropperImage.src = e.target.result;
+                        cropperModal.modal('show');
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            function updateInput(dataUrl) {
+                var blob = dataURLtoBlob(dataUrl);
+                var file = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+                var container = new DataTransfer();
+                container.items.add(file);
+                inputElement.files = container.files;
+            }
+
+            function dataURLtoBlob(dataUrl) {
+                var arr = dataUrl.split(','), mime = arr[0].match(/:(.*?);/)[1], bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+                while(n--){
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                return new Blob([u8arr], {type:mime});
+            }
+
+            $('#createForm input[type="file"], #editForm input[type="file"]').on('change', function() {
+                inputElement = this;
+                readFile(this);
+            });
+
+            cropperModal.on('shown.bs.modal', function () {
+                cropper = new Cropper(cropperImage, {
+                    aspectRatio: 1,
+                    viewMode: 1
+                });
+            }).on('hidden.bs.modal', function () {
+                cropper.destroy();
+                cropper = null;
+            });
+
+            $('#cropButton').on('click', function() {
+                var canvas = cropper.getCroppedCanvas();
+                var dataUrl = canvas.toDataURL('image/jpeg');
+                updateInput(dataUrl);
+                cropperModal.modal('hide');
+            });
+
             $('.img-thumbnail').on('click', function() {
                 var src = $(this).data('src');
                 $('#modalImage').attr('src', src);
                 $('#viewImageModal').modal('show');
             });
-        });
 
-        $('#editModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget); // Button that triggered the modal
-            var id = button.data('id');
-            var nim = button.data('nim');
-            var nama = button.data('nama');
-            var fotodiri = button.data('fotodiri');
-            var fotoktp = button.data('fotoktp');
+            $('#editModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Button that triggered the modal
+                var id = button.data('id');
+                var nim = button.data('nim');
+                var nama = button.data('nama');
+                var fotodiri = button.data('fotodiri');
+                var fotoktp = button.data('fotoktp');
 
-            var modal = $(this);
-            modal.find('#edit_nim').val(nim);
-            modal.find('#edit_nama').val(nama);
-            modal.find('#edit_foto_diri_preview').attr('src', '/uploads/' + fotodiri);
-            modal.find('#edit_foto_ktp_preview').attr('src', '/uploads/' + fotoktp);
-            modal.find('form').attr('action', '/mahasiswa/update/' + id);
+                var modal = $(this);
+                modal.find('#edit_nim').val(nim);
+                modal.find('#edit_nama').val(nama);
+                modal.find('#edit_foto_diri_preview').attr('src', '/uploads/' + fotodiri);
+                modal.find('#edit_foto_ktp_preview').attr('src', '/uploads/' + fotoktp);
+                modal.find('form').attr('action', '/mahasiswa/update/' + id);
+            });
         });
     </script>
 </body>

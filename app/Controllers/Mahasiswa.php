@@ -19,33 +19,35 @@ class Mahasiswa extends Controller
     {
         return view('mahasiswa/create');
     }
-
     public function store()
     {
-        $model = new MahasiswaModel();
-    
-        // Upload foto_diri
+        $mahasiswaModel = new MahasiswaModel();
+
+        $nim = $this->request->getPost('nim');
+        $nama = $this->request->getPost('nama');
+
         $fotoDiri = $this->request->getFile('foto_diri');
+        $fotoKtp = $this->request->getFile('foto_ktp');
+
         if ($fotoDiri->isValid() && !$fotoDiri->hasMoved()) {
             $fotoDiriName = $fotoDiri->getRandomName();
-            $fotoDiri->move(FCPATH . 'uploads', $fotoDiriName);
+            $fotoDiri->move('uploads', $fotoDiriName);
         }
-    
-        // Upload foto_ktp
-        $fotoKtp = $this->request->getFile('foto_ktp');
+
         if ($fotoKtp->isValid() && !$fotoKtp->hasMoved()) {
             $fotoKtpName = $fotoKtp->getRandomName();
-            $fotoKtp->move(FCPATH . 'uploads', $fotoKtpName);
+            $fotoKtp->move('uploads', $fotoKtpName);
         }
-    
+
         $data = [
-            'nim' => $this->request->getPost('nim'),
-            'nama' => $this->request->getPost('nama'),
+            'nim' => $nim,
+            'nama' => $nama,
             'foto_diri' => $fotoDiriName ?? null,
             'foto_ktp' => $fotoKtpName ?? null,
         ];
-    
-        $model->save($data);
+
+        $mahasiswaModel->insert($data);
+
         return redirect()->to('/mahasiswa');
     }
     
@@ -58,32 +60,36 @@ class Mahasiswa extends Controller
     }
 
     public function update($id)
-{
-    $model = new MahasiswaModel();
-    $data = [
-        'nim' => $this->request->getPost('nim'),
-        'nama' => $this->request->getPost('nama'),
-    ];
+    {
+        $mahasiswaModel = new MahasiswaModel();
 
-    // Upload foto_diri jika ada
-    if ($this->request->getFile('foto_diri')->isValid()) {
+        $nim = $this->request->getPost('nim');
+        $nama = $this->request->getPost('nama');
+
         $fotoDiri = $this->request->getFile('foto_diri');
-        $fotoDiriName = $fotoDiri->getRandomName();
-        $fotoDiri->move(FCPATH . 'uploads', $fotoDiriName);
-        $data['foto_diri'] = $fotoDiriName;
-    }
-
-    // Upload foto_ktp jika ada
-    if ($this->request->getFile('foto_ktp')->isValid()) {
         $fotoKtp = $this->request->getFile('foto_ktp');
-        $fotoKtpName = $fotoKtp->getRandomName();
-        $fotoKtp->move(FCPATH . 'uploads', $fotoKtpName);
-        $data['foto_ktp'] = $fotoKtpName;
-    }
 
-    $model->update($id, $data);
-    return redirect()->to('/mahasiswa');
-}
+        $data = [
+            'nim' => $nim,
+            'nama' => $nama,
+        ];
+
+        if ($fotoDiri->isValid() && !$fotoDiri->hasMoved()) {
+            $fotoDiriName = $fotoDiri->getRandomName();
+            $fotoDiri->move('uploads', $fotoDiriName);
+            $data['foto_diri'] = $fotoDiriName;
+        }
+
+        if ($fotoKtp->isValid() && !$fotoKtp->hasMoved()) {
+            $fotoKtpName = $fotoKtp->getRandomName();
+            $fotoKtp->move('uploads', $fotoKtpName);
+            $data['foto_ktp'] = $fotoKtpName;
+        }
+
+        $mahasiswaModel->update($id, $data);
+
+        return redirect()->to('/mahasiswa');
+    }
 
 
 
